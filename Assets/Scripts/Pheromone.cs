@@ -2,22 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Pheromone : MonoBehaviour {
+public class Pheromone : MonoBehaviour 
+{
 
-	public Vector3 size;
-	public Vector3 coordinates;
 	public float concentration;
 	//species
 	public float evaporationRate;
-
+	public Transform pheromone;
 
 	// Use this for initialization
-	void Start () {
-		
+	void Start () 
+	{
+		Instantiate (pheromone, new Vector3 (transform.position.x, transform.position.y, transform.position.z), Quaternion.identity);
 	}
 	
 	// Update is called once per frame
-	void Update () {
-		
+	void Update () 
+	{
+		Destroy (gameObject, 5f);
 	}
 }

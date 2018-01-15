@@ -35,10 +35,14 @@ public class AntClass : MonoBehaviour
 	//maximum amount of random displacement a second
 	public float wanderJitter = 40f;
 	private Vector3 wanderTarget;
+	private Vector3 _previousPosition;
+	private Vector3 targetPosition;
 
 	//[SerializeField]
 	public Transform _destination;
 	NavMeshAgent _navMeshAgent;
+
+
 
 	// Use this for initialization
 	void Start () 
@@ -59,8 +63,15 @@ public class AntClass : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
+		
+
+	}
+
+	void FixedUpdate()
+	{
+		secrete ();
 		getSteering ();
-		SetDestination ();
+		setDestination ();
 	}
 
 	//add the ant to the map
@@ -130,9 +141,12 @@ public class AntClass : MonoBehaviour
 	}
 
 	//secretes a pheremone where the ant is currently standing
-	void Secrete()
+	void secrete()
 	{
+		if (transform.position.y < _previousPosition.y + 0.5f && transform.position.y > _previousPosition.y - 0.5f && transform.position.x < _previousPosition.x + 0.5f && transform.position.x > _previousPosition.x - 0.1f)
+		{
 
+		}
 	}
 
 	//decides how the ant moves e.g. follow a pheremone or wander randomly
@@ -142,11 +156,12 @@ public class AntClass : MonoBehaviour
 	}
 
 	//moves the ant in the direction its facing
-	private void SetDestination()
+	private void setDestination()
 	{		
 		if (_destination != null)
 		{
 			Vector3 targetVector = _destination.transform.position;
+			//_navMeshAgent.SetDestination (_destination);
 			_navMeshAgent.SetDestination (getSteering());
 			//print (targetVector);
 		}
@@ -160,22 +175,27 @@ public class AntClass : MonoBehaviour
 
 	public Vector3 getSteering ()
 	{
-		//get the jitter for this time frame
-		float jitter = wanderJitter * Time.deltaTime;
+		if ((transform.position.y < _previousPosition.y + 0.5f && transform.position.y > _previousPosition.y - 0.5f && transform.position.x < _previousPosition.x + 0.5f && transform.position.x > _previousPosition.x - 0.5f) || targetPosition.y == 0f && targetPosition.x == 0f ) {
+			//get the jitter for this time frame
+			float jitter = wanderJitter * Time.deltaTime;
 
-		//add a small random vector to the target's position
-		wanderTarget += new Vector3 (Random.Range (-1f, 1f) * jitter, 0f, Random.Range (-1f, 1f) * jitter);
+			//add a small random vector to the target's position
+			wanderTarget += new Vector3 (Random.Range (-1f, 1f) * jitter, 0f, Random.Range (-1f, 1f) * jitter);
 
-		//make the wanderTarget fit on the wander circle again
-		wanderTarget.Normalize ();
-		wanderTarget *= wanderRadius;
+			//make the wanderTarget fit on the wander circle again
+			wanderTarget.Normalize ();
+			wanderTarget *= wanderRadius;
 
-		//move the target in front of the character
-		Vector3 targetPosition = transform.position + transform.forward * wanderDistance + wanderTarget;
-		targetPosition.y = transform.position.y;
+			//move the target in front of the character
+			targetPosition = transform.position + transform.forward * wanderDistance + wanderTarget;
+			targetPosition.y = transform.position.y;
+
+			_previousPosition = targetPosition;
+
+		}
 
 		Debug.DrawLine (transform.position, targetPosition);
-		Debug.Log ("target position = " + targetPosition);
+		//Debug.Log ("target position = " + targetPosition);
 
 		return targetPosition;
 	}
